@@ -1,4 +1,247 @@
 
+// .top-role-selector {
+//   display: flex;
+//   justify-content: space-between;
+//   margin-bottom: 20px;
+//   background: #f3f4f6;
+//   border-radius: 8px;
+//   padding: 5px;
+// }
+
+// .top-role-selector label {
+//   flex: 1;
+//   text-align: center;
+//   padding: 8px 0;
+//   cursor: pointer;
+//   font-size: 14px;
+//   border-radius: 6px;
+//   transition: 0.2s;
+// }
+
+// .top-role-selector input {
+//   display: none;
+// }
+
+// .top-role-selector label.active {
+//   background: #4f46e5;
+//   color: white;
+//   font-weight: 600;
+// }
+
+// .login-page {
+//   position: relative;
+//   width: 100%;
+//   height: 100vh;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+
+// //   background-image: url('../assets/queue.png');
+// background-image: url("../../../assets/queue.png");
+//   background-repeat: no-repeat;
+//   background-size: cover;
+//   background-position: center;
+//   background-attachment: fixed;
+
+//   .login-container {
+//     position: relative;
+//     z-index: 1;
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+
+//     width: 350px;
+//     padding: 2.5rem;
+//     background: #fbf3f3;
+//     border-radius: 1.5rem;
+//     box-shadow: 0 8px 32px rgba(94, 203, 233, 0.12);
+//     transition: transform 0.22s, box-shadow 0.25s;
+
+//     &:hover {
+//       transform: scale(1.03) translateY(-4px);
+//       box-shadow: 0 16px 42px rgba(94, 203, 233, 0.22),
+//         0 2px 8px #fd8ba3;
+//     }
+//   }
+// }
+
+// /* Input styles */
+// .login-container input[type="text"],
+// .login-container input[type="password"] {
+//   width: 300px;
+//   border: 2px solid #aee2ff;
+//   border-radius: 8px;
+//   padding: 0.8rem 1rem;
+//   font-size: 1rem;
+//   background: #f8ffff;
+//   margin-bottom: 1rem;
+//   transition: border 0.2s, box-shadow 0.25s;
+//   box-shadow: 0 1px 4px #fd8ba314;
+
+//   &:focus {
+//     border-color: #fd8ba3;
+//     box-shadow: 0 4px 14px #fd8ba354;
+//   }
+
+//   &:hover {
+//     border-color: #87a8ff;
+//     box-shadow: 0 2px 14px #6fe7ff33;
+//   }
+// }
+
+// /* Error message style */
+// .form-error {
+//   color: #fb3640;
+//   background: #ffd6da;
+//   border-radius: 6px;
+//   font-size: 0.98rem;
+//   padding: 0.3rem 0.5rem;
+//   margin-bottom: 0.5rem;
+//   transition: background 0.2s;
+// }
+
+// /* Submit button */
+// .login-container button {
+//   width: 90px;
+//   margin-top: 1.2rem;
+//   margin-left: 7rem;
+//   background: linear-gradient(90deg, #6fe7ff 10%, #fd8ba3 90%);
+//   color: #fff;
+//   font-weight: 600;
+//   border: none;
+//   border-radius: 9px;
+//   padding: 0.8rem;
+//   cursor: pointer;
+//   box-shadow: 0 2px 10px #36d1c45a;
+//   transition: background 0.15s, box-shadow 0.22s, transform 0.18s;
+
+//   &:hover {
+//     background: linear-gradient(90deg, #fd8ba3 10%, #6fe7ff 90%);
+//     box-shadow: 0 8px 38px #fd8ba354;
+//     transform: scale(1.05) rotate(-1deg);
+//     letter-spacing: 0.08em;
+//   }
+// }
+
+// .switch-text {
+//   margin-top: 1rem;
+//   font-size: 0.95rem;
+//   color: #555;
+
+//   .link-text {
+//     color: #fd8ba3;
+//     font-weight: 600;
+//     cursor: pointer;
+//     transition: color 0.2s;
+
+//     &:hover {
+//       color: #6fe7ff;
+//     }
+//   }
+// }
+
+
+// /* ===================================== */
+// /* ✅ ADDED: Show / Hide Password Style  */
+// /* ===================================== */
+
+// .password-field {
+//   position: relative;
+//   width: 300px;
+// }
+
+// .password-field input {
+//   width: 100%;
+// }
+
+// .toggle-password {
+//   position: absolute;
+//   right: 12px;
+//   top: 38%;
+//   transform: translateY(-50%);
+//   cursor: pointer;
+//   font-size: 0.85rem;
+//   font-weight: 600;
+//   color: #4f46e5;
+//   transition: color 0.2s ease;
+
+//   &:hover {
+//     color: #fd8ba3;
+//   }
+// }
+
+
+// /* ===================================== */
+// /* ✅ ADDED: Forgot Password Style       */
+// /* ===================================== */
+
+// .forgot-password {
+//   width: 300px;
+//   text-align: right;
+//   font-size: 0.9rem;
+//   margin-top: -0.5rem;
+//   margin-bottom: 0.8rem;
+//   cursor: pointer;
+//   color: #4f46e5;
+//   font-weight: 500;
+//   transition: color 0.2s ease;
+
+//   &:hover {
+//     color: #fd8ba3;
+//     text-decoration: underline;
+//   }
+  
+// }
+// /* OTP Modal */
+// .otp-modal {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background: rgba(0,0,0,0.6);
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   z-index: 1000;
+// }
+
+// .otp-box {
+//   background: white;
+//   padding: 2rem;
+//   width: 320px;
+//   border-radius: 12px;
+//   text-align: center;
+// }
+
+// .otp-box input {
+//   width: 100%;
+//   margin-bottom: 1rem;
+//   padding: 0.7rem;
+//   border-radius: 6px;
+//   border: 1px solid #ccc;
+// }
+
+// .otp-box button {
+//   width: 100%;
+//   padding: 0.7rem;
+//   border: none;
+//   background: #4f46e5;
+//   color: white;
+//   border-radius: 6px;
+//   cursor: pointer;
+// }
+
+// .close-modal {
+//   margin-top: 1rem;
+//   cursor: pointer;
+//   color: red;
+// }
+
+
+
+
 .top-role-selector {
   display: flex;
   justify-content: space-between;
@@ -22,7 +265,7 @@
   display: none;
 }
 
-.top-role-selector label.active {
+.top-role-selector label:has(input:checked) {
   background: #4f46e5;
   color: white;
   font-weight: 600;
@@ -35,9 +278,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
-//   background-image: url('../assets/queue.png');
-background-image: url("../../../assets/queue.png");
+  // background-image: url('../assets/queue.png');
+  background-image: url("../../../assets/queue.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -50,7 +292,6 @@ background-image: url("../../../assets/queue.png");
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     width: 350px;
     padding: 2.5rem;
     background: #fbf3f3;
@@ -67,6 +308,7 @@ background-image: url("../../../assets/queue.png");
 }
 
 /* Input styles */
+.login-container input[type="email"],
 .login-container input[type="text"],
 .login-container input[type="password"] {
   width: 300px;
@@ -141,11 +383,9 @@ background-image: url("../../../assets/queue.png");
   }
 }
 
-
 /* ===================================== */
-/* ✅ ADDED: Show / Hide Password Style  */
+/* ✅ ADDED: Show / Hide Password Style */
 /* ===================================== */
-
 .password-field {
   position: relative;
   width: 300px;
@@ -171,11 +411,9 @@ background-image: url("../../../assets/queue.png");
   }
 }
 
-
 /* ===================================== */
-/* ✅ ADDED: Forgot Password Style       */
+/* ✅ ADDED: Forgot Password Style */
 /* ===================================== */
-
 .forgot-password {
   width: 300px;
   text-align: right;
@@ -191,8 +429,8 @@ background-image: url("../../../assets/queue.png");
     color: #fd8ba3;
     text-decoration: underline;
   }
-  
 }
+
 /* OTP Modal */
 .otp-modal {
   position: fixed;
@@ -200,7 +438,7 @@ background-image: url("../../../assets/queue.png");
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;

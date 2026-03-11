@@ -180,7 +180,7 @@ const GovtOfficeList = () => {
               <div>
                 <div className="service-name">{office.name}</div>
                 {/* ⚠️ Use correct backend field */}
-                <div className="service-meta">⏱ {office.workingTime}</div>
+                <div className="service-meta">⏱ {office.time}</div>
                 <div className="service-location">📍 {office.location}</div>
               </div>
 

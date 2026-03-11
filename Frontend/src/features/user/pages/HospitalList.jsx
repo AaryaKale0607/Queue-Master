@@ -230,7 +230,7 @@ const Hospitals = () => {
             >
               <div>
                 <div className="service-name">{h.name}</div>
-                <div className="service-meta">⏱ {h.workingTime}</div>
+                <div className="service-meta">⏱ {h.time}</div>
                 <div className="service-location">📍 {h.location}</div>
               </div>
 

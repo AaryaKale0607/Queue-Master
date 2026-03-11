@@ -177,7 +177,7 @@ const Banks = () => {
             >
               <div>
                 <div className="service-name">{bank.name}</div>
-                <div className="service-meta">⏱ {bank.workingTime}</div>
+                <div className="service-meta">⏱ {bank.time}</div>
                 <div className="service-location">📍 {bank.location}</div>
               </div>
 

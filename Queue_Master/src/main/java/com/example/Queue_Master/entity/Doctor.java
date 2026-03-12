@@ -1,8 +1,6 @@
-// ================================================
-// 3. Entities (mostly unchanged – just minor cleanup)
-// ================================================
 
-// Doctor.java
+
+// Doctor.java (unchanged – already correct)
 package com.example.Queue_Master.entity;
 
 import jakarta.persistence.*;
@@ -46,7 +44,7 @@ public class Doctor {
         }
     }
 
-    // Backward compatibility
+    // This is useful for DTOs/serialization, but NOT used by Spring Data query methods
     public Long getBranchId() {
         return branch != null ? branch.getId() : null;
     }

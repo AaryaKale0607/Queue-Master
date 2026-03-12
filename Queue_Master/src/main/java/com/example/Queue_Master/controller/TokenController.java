@@ -1,104 +1,91 @@
 package com.example.Queue_Master.controller;
 
+import com.example.Queue_Master.dto.QueueStatusResponse;
 import com.example.Queue_Master.dto.TokenRequest;
-import com.example.Queue_Master.entity.Token;
+import com.example.Queue_Master.dto.TokenResponse;
 import com.example.Queue_Master.service.TokenService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/tokens")
+@RequestMapping("/api/v1/tokens")
+@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class TokenController {
 
     private final TokenService tokenService;
 
-    public TokenController(TokenService tokenService) {
-        this.tokenService = tokenService;
+    // POST /api/v1/tokens/book
+    @PostMapping("/book")
+    public ResponseEntity<TokenResponse> bookToken(
+            @Valid @RequestBody TokenRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(tokenService.bookToken(request));
     }
 
-    @PostMapping("/book")
-    public ResponseEntity<?> bookToken(@RequestBody TokenRequest request) {
+    // DELETE /api/v1/tokens/{tokenId}/cancel?userId=5
+    @DeleteMapping("/{tokenId}/cancel")
+    public ResponseEntity<TokenResponse> cancelToken(
+            @PathVariable Long tokenId,
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(tokenService.cancelToken(tokenId, userId));
+    }
 
-        if (request.getUserId() == null || request.getUserId() <= 0) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "userId is required and must be positive"));
-        }
+    // GET /api/v1/tokens/user/{userId}/active
+    @GetMapping("/user/{userId}/active")
+    public ResponseEntity<List<TokenResponse>> getUserActiveTokens(
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(tokenService.getUserActiveTokens(userId));
+    }
 
-        if (request.getBranchServiceId() == null || request.getBranchServiceId() <= 0) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "branchServiceId is required and must be positive"));
-        }
+    // GET /api/v1/tokens/user/{userId}/history
+    @GetMapping("/user/{userId}/history")
+    public ResponseEntity<List<TokenResponse>> getUserTokenHistory(
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(tokenService.getUserTokenHistory(userId));
+    }
 
-        try {
-            Token token = tokenService.bookToken(
-                    request.getUserId(),
-                    request.getDoctorId(),
-                    request.getBranchServiceId()
-            );
-            return ResponseEntity.ok(token);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Internal error", "message", e.getMessage()));
-        }
+    // GET /api/v1/tokens/doctor/{doctorId}/queue-status?date=2026-03-12
+    @GetMapping("/doctor/{doctorId}/queue-status")
+    public ResponseEntity<QueueStatusResponse> getDoctorQueueStatus(
+            @PathVariable Long doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(
+                tokenService.getDoctorQueueStatus(doctorId, date));
+    }
+
+    // GET /api/v1/tokens/branch-service/{id}/queue-status?date=2026-03-12
+    @GetMapping("/branch-service/{branchServiceId}/queue-status")
+    public ResponseEntity<QueueStatusResponse> getBranchServiceQueueStatus(
+            @PathVariable Long branchServiceId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(
+                tokenService.getBranchServiceQueueStatus(branchServiceId, date));
+    }
+
+    // POST /api/v1/tokens/doctor/{doctorId}/call-next?date=2026-03-12
+    @PostMapping("/doctor/{doctorId}/call-next")
+    public ResponseEntity<TokenResponse> callNextDoctorToken(
+            @PathVariable Long doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(
+                tokenService.callNextDoctorToken(doctorId, date));
+    }
+
+    // POST /api/v1/tokens/branch-service/{id}/call-next?date=2026-03-12
+    @PostMapping("/branch-service/{branchServiceId}/call-next")
+    public ResponseEntity<TokenResponse> callNextBranchServiceToken(
+            @PathVariable Long branchServiceId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(
+                tokenService.callNextBranchServiceToken(branchServiceId, date));
     }
 }
-//
-//package com.example.Queue_Master.controller;
-//
-//import com.example.Queue_Master.dto.TokenRequest;
-//import com.example.Queue_Master.entity.Token;
-//import com.example.Queue_Master.service.TokenService;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.HashMap;
-//import java.util.Map;
-//
-//@RestController
-//@RequestMapping("/api/tokens")
-//@CrossOrigin(origins = "*")
-//public class TokenController {
-//
-//    private final TokenService tokenService;
-//
-//    public TokenController(TokenService tokenService) {
-//        this.tokenService = tokenService;
-//    }
-//
-//    @PostMapping("/book")
-//    public ResponseEntity<?> bookToken(@RequestBody TokenRequest request) {
-//        try {
-//            if (request.getUserId() == null) {
-//                return ResponseEntity.badRequest().body(Map.of("error", "userId is required"));
-//            }
-//            if (request.getBranchServiceId() == null) {
-//                return ResponseEntity.badRequest().body(Map.of("error", "branchServiceId is required"));
-//            }
-//
-//            Token token = tokenService.bookToken(
-//                    request.getUserId(),
-//                    request.getDoctorId(),
-//                    request.getBranchServiceId()
-//            );
-//
-//            return ResponseEntity.ok(token);
-//        } catch (IllegalArgumentException e) {
-//            Map<String, String> error = new HashMap<>();
-//            error.put("error", e.getMessage());
-//            return ResponseEntity.badRequest().body(error);
-//        } catch (Exception e) {
-//            Map<String, String> error = new HashMap<>();
-//            error.put("error", "Internal server error");
-//            error.put("message", e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-//        }
-//    }
-//}

@@ -9,8 +9,11 @@ import java.util.List;
 @Repository
 public interface BranchRepository extends JpaRepository<Branch, Long> {
 
-    // ────────────────────────────────────────────────
-    //   CHANGED: Add underscore for nested property (category.id)
-    List<Branch> findByCategory_Id(Long categoryId);  // Now matches: branch.category.id
+    // This method is used in MainService
+    List<Branch> findByCategory_Id(Long categoryId);
 
+    // Optional useful methods (add if you need them)
+    List<Branch> findByCategory_IdAndStatus(Long categoryId, String status);
+    List<Branch> findByNameContainingIgnoreCase(String name);
+    List<Branch> findByLocationContainingIgnoreCase(String location);
 }

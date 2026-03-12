@@ -1,3 +1,4 @@
+
 package com.example.Queue_Master.repository;
 
 import com.example.Queue_Master.entity.Doctor;
@@ -5,12 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
-@Repository  // ← Add this if missing (though JpaRepository implies it)
+@Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
-    // ────────────────────────────────────────────────
-    //   CHANGED: Add underscore for nested property (branch.id)
-    List<Doctor> findByBranch_Id(Long branchId);  // Now matches: doctor.branch.id
+    Optional<Doctor> findByIdAndBranch_Id(Long doctorId, Long branchId);
 
+    List<Doctor> findByBranch_Id(Long branchId);                    // ← FIXED
+
+    List<Doctor> findByBranch_IdAndStatus(Long branchId, String status);  // ← FIXED
 }

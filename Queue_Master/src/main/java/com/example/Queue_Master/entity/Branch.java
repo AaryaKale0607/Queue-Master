@@ -1,12 +1,10 @@
-// Branch.java
-package com.example.Queue_Master.entity;
+package com.example.Queue_Master.entity;   // ← MUST BE THIS EXACTLY
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.ArrayList;
 import java.util.List;
 

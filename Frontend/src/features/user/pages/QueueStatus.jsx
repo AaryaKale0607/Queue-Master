@@ -1,251 +1,263 @@
-
-
-// import React from "react";
-// import { useNavigate } from "react-router-dom";
-// import "../styles/QueueStatus.scss";
-// import { FiClock, FiUsers, FiCheckCircle, FiArrowLeft } from "react-icons/fi";
-
-// const QueueStatus = () => {
-//   const navigate = useNavigate();
-
-//   const currentToken = "A21";
-//   const nowServing = "A18";
-//   const peopleAhead = 3;
-//   const estimatedWait = "12 mins";
-
-//   const queueList = ["A18", "A19", "A20", "A21", "A22", "A23"];
-
-//   return (
-//     <div className="queue-status-page">
-
-//       {/* ===== TOP NAVBAR ===== */}
-//       <div className="qs-navbar">
-//         <button className="back-btn" onClick={() => navigate(-1)}>
-//           <FiArrowLeft /> Back
-//         </button>
-
-//         <h2>Queue Status</h2>
-
-//         <div className="live-indicator">
-//           <span className="dot"></span> Live
-//         </div>
-//       </div>
-
-//       <h1 className="page-title">Live Queue Status</h1>
-
-//       {/* ===== STATUS CARDS ===== */}
-//       <div className="status-grid">
-//         <div className="status-card highlight">
-//           <h3>Your Token</h3>
-//           <div className="big-token">{currentToken}</div>
-//           <span className="badge waiting">Waiting</span>
-//         </div>
-
-//         <div className="status-card">
-//           <FiCheckCircle className="card-icon green" />
-//           <div>
-//             <h4>Now Serving</h4>
-//             <p className="value">{nowServing}</p>
-//           </div>
-//         </div>
-
-//         <div className="status-card">
-//           <FiUsers className="card-icon blue" />
-//           <div>
-//             <h4>People Ahead</h4>
-//             <p className="value">{peopleAhead}</p>
-//           </div>
-//         </div>
-
-//         <div className="status-card">
-//           <FiClock className="card-icon orange" />
-//           <div>
-//             <h4>Estimated Wait</h4>
-//             <p className="value">{estimatedWait}</p>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* ===== PROGRESS SECTION ===== */}
-//       <div className="progress-section">
-//         <div className="progress-header">
-//           <h3>Queue Progress</h3>
-//           <span>75% Completed</span>
-//         </div>
-
-//         <div className="progress-bar">
-//           <div className="progress-fill" style={{ width: "75%" }}></div>
-//         </div>
-
-//         <p className="progress-text">
-//           Almost your turn. Please stay nearby and watch the display.
-//         </p>
-//       </div>
-
-//       {/* ===== LIVE QUEUE LIST ===== */}
-//       <div className="queue-list-section">
-//         <div className="list-header">
-//           <h3>Live Queue Line</h3>
-//           <span className="updated">Updated just now</span>
-//         </div>
-
-//         <div className="queue-list">
-//           {queueList.map((token, index) => (
-//             <div
-//               key={index}
-//               className={`queue-item ${
-//                 token === currentToken ? "active" : ""
-//               }`}
-//             >
-//               {token}
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default QueueStatus;
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/QueueStatus.scss";
-import { FiClock, FiUsers, FiCheckCircle, FiArrowLeft } from "react-icons/fi";
+import { FiClock, FiUsers, FiCheckCircle, FiArrowLeft, FiHash } from "react-icons/fi";
 import axios from "axios";
 
 const QueueStatus = () => {
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const [queueList, setQueueList] = useState([]);
-  const [currentToken, setCurrentToken] = useState(null);
-  const [nowServing, setNowServing] = useState(null);
-  const [peopleAhead, setPeopleAhead] = useState(0);
-  const [estimatedWait, setEstimatedWait] = useState("");
+    const [activeTokens, setActiveTokens]   = useState([]);
+    const [queueStatuses, setQueueStatuses] = useState({});
+    const [loading, setLoading]             = useState(true);
+    const [lastUpdated, setLastUpdated]     = useState(null);
 
-  const doctorId = 1; // selected doctor
+    const userId = localStorage.getItem("userId");
+    const token  = localStorage.getItem("token");
+    const authHeaders = { headers: { Authorization: `Bearer ${token}` } };
 
-  useEffect(() => {
-    loadQueue();
-  }, []);
+    const loadActiveTokens = async () => {
+        if (!userId) { navigate("/login"); return []; }
+        try {
+            const res = await axios.get(
+                `http://localhost:8080/api/v1/tokens/user/${userId}/active`,
+                authHeaders
+            );
+            return res.data || [];
+        } catch (err) {
+            console.error("Failed to load tokens:", err);
+            return [];
+        }
+    };
 
-  const loadQueue = async () => {
-    try {
+    const loadQueueStatuses = async (tokens) => {
+        if (!tokens?.length) return {};
+        const today    = new Date().toISOString().split("T")[0];
+        const statuses = {};
 
-      const res = await axios.get(`http://localhost:8080/api/queue/${doctorId}`);
+        await Promise.all(tokens.map(async (t) => {
+            try {
+                const key = t.queueType === "DOCTOR"
+                    ? `doctor-${t.doctorId}`
+                    : `bs-${t.branchServiceId}`;
 
-      const tokens = res.data.map(t => "A" + t.tokenNumber);
+                const url = t.queueType === "DOCTOR"
+                    ? `http://localhost:8080/api/v1/tokens/doctor/${t.doctorId}/queue-status`
+                    : `http://localhost:8080/api/v1/tokens/branch-service/${t.branchServiceId}/queue-status`;
 
-      setQueueList(tokens);
+                const res = await axios.get(url, { params: { date: today } });
+                statuses[key] = res.data;
+            } catch (err) {
+                console.error("Queue status error:", err);
+            }
+        }));
 
-      if (tokens.length > 0) {
+        return statuses;
+    };
 
-        setNowServing(tokens[0]);
+    const refresh = async () => {
+        const tokens   = await loadActiveTokens();
+        const statuses = await loadQueueStatuses(tokens);
+        setActiveTokens(tokens);
+        setQueueStatuses(statuses);
+        setLastUpdated(new Date());
+        setLoading(false);
+    };
 
-        const myToken = tokens[tokens.length - 1];
+    useEffect(() => {
+        refresh();
+        const interval = setInterval(refresh, 10000);
+        return () => clearInterval(interval);
+    }, []);
 
-        setCurrentToken(myToken);
+    const getQueueData = (t) => {
+        const key = t.queueType === "DOCTOR"
+            ? `doctor-${t.doctorId}`
+            : `bs-${t.branchServiceId}`;
+        return queueStatuses[key] || null;
+    };
 
-        const index = tokens.indexOf(myToken);
+    const statusBadgeClass = (status) => {
+        switch (status) {
+            case "BOOKED":      return "badge waiting";
+            case "CALLED":      return "badge called";
+            case "IN_PROGRESS": return "badge serving";
+            case "COMPLETED":   return "badge done";
+            default:            return "badge waiting";
+        }
+    };
 
-        setPeopleAhead(index);
+    const statusLabel = (status) => {
+        switch (status) {
+            case "BOOKED":      return "Waiting";
+            case "CALLED":      return "Called!";
+            case "IN_PROGRESS": return "Now Serving";
+            case "COMPLETED":   return "Completed";
+            default:            return status;
+        }
+    };
 
-        setEstimatedWait(index * 4 + " mins");
+    const formatTime = (date) => {
+        if (!date) return "";
+        return date.toLocaleTimeString("en-IN", {
+            hour: "2-digit", minute: "2-digit", second: "2-digit"
+        });
+    };
 
-      }
+    return (
+        <div className="queue-status-page">
 
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  return (
-    <div className="queue-status-page">
-
-      <div className="qs-navbar">
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          <FiArrowLeft /> Back
-        </button>
-
-        <h2>Queue Status</h2>
-
-        <div className="live-indicator">
-          <span className="dot"></span> Live
-        </div>
-      </div>
-
-      <h1 className="page-title">Live Queue Status</h1>
-
-      <div className="status-grid">
-
-        <div className="status-card highlight">
-          <h3>Your Token</h3>
-          <div className="big-token">{currentToken}</div>
-          <span className="badge waiting">Waiting</span>
-        </div>
-
-        <div className="status-card">
-          <FiCheckCircle className="card-icon green" />
-          <div>
-            <h4>Now Serving</h4>
-            <p className="value">{nowServing}</p>
-          </div>
-        </div>
-
-        <div className="status-card">
-          <FiUsers className="card-icon blue" />
-          <div>
-            <h4>People Ahead</h4>
-            <p className="value">{peopleAhead}</p>
-          </div>
-        </div>
-
-        <div className="status-card">
-          <FiClock className="card-icon orange" />
-          <div>
-            <h4>Estimated Wait</h4>
-            <p className="value">{estimatedWait}</p>
-          </div>
-        </div>
-
-      </div>
-
-      <div className="queue-list-section">
-
-        <div className="list-header">
-          <h3>Live Queue Line</h3>
-          <span className="updated">Updated just now</span>
-        </div>
-
-        <div className="queue-list">
-
-          {queueList.map((token, index) => (
-
-            <div
-              key={index}
-              className={`queue-item ${token === currentToken ? "active" : ""}`}
-            >
-              {token}
+            {/* NAVBAR */}
+            <div className="qs-navbar">
+                <button className="back-btn" onClick={() => navigate(-1)}>
+                    <FiArrowLeft /> Back
+                </button>
+                <h2>Live Queue Status</h2>
+                <div className="live-indicator">
+                    <span className="dot" />
+                    Live · {formatTime(lastUpdated)}
+                </div>
             </div>
 
-          ))}
+            {/* PAGE HEADER */}
+            {!loading && activeTokens.length > 0 && (
+                <div className="qs-page-header">
+                    <h1>Your Active Bookings</h1>
+                    <p>Updates automatically every 10 seconds</p>
+                </div>
+            )}
+
+            {/* LOADING */}
+            {loading ? (
+                <div className="qs-loading">
+                    <div className="spinner" />
+                    <p>Fetching your queue status...</p>
+                </div>
+
+            /* EMPTY */
+            ) : activeTokens.length === 0 ? (
+                <div className="qs-empty">
+                    <div className="empty-icon">🎫</div>
+                    <h3>No Active Bookings</h3>
+                    <p>You have no active tokens right now.</p>
+                    <button
+                        className="book-btn"
+                        onClick={() => navigate("/Userdashboard")}
+                    >
+                        Book a Token
+                    </button>
+                </div>
+
+            /* TOKEN CARDS */
+            ) : (
+                <div className="tokens-container">
+                    {activeTokens.map((t) => {
+                        const q     = getQueueData(t);
+                        const ahead = t.queuePosition ?? 0;
+                        const wait  = t.estimatedWaitTimeMinutes ?? 0;
+                        const total = q?.totalTokens ?? 0;
+                        const done  = q?.completedCount ?? 0;
+                        const pct   = total > 0
+                            ? Math.round((done / total) * 100) : 0;
+
+                        return (
+                            <div key={t.tokenId} className="token-card">
+
+                                {/* HEADER */}
+                                <div className="tc-header">
+                                    <div className="tc-left">
+                                        <div className="tc-type-icon">
+                                            {t.queueType === "DOCTOR" ? "🏥" : "🏦"}
+                                        </div>
+                                        <div>
+                                            <div className="tc-title">
+                                                {t.doctorName || t.branchServiceName}
+                                            </div>
+                                            <div className="tc-subtitle">
+                                                {t.branchName} · {t.branchLocation}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="tc-right">
+                                        <div className="tc-token-number">
+                                            {t.displayToken}
+                                        </div>
+                                        <div className="tc-meta">
+                                            <span className={statusBadgeClass(t.status)}>
+                                                {statusLabel(t.status)}
+                                            </span>
+                                            <span className="tc-date">
+                                                {t.bookingDate}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* STATS */}
+                                <div className="tc-stats">
+                                    <div className="stat-item">
+                                        <div className="stat-icon-box green">
+                                            <FiCheckCircle />
+                                        </div>
+                                        <div>
+                                            <div className="stat-label">Now Serving</div>
+                                            <div className="stat-value">
+                                                {q?.currentlyServingToken || "—"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="stat-item">
+                                        <div className="stat-icon-box blue">
+                                            <FiUsers />
+                                        </div>
+                                        <div>
+                                            <div className="stat-label">Ahead of You</div>
+                                            <div className="stat-value">{ahead}</div>
+                                        </div>
+                                    </div>
+                                    <div className="stat-item">
+                                        <div className="stat-icon-box orange">
+                                            <FiClock />
+                                        </div>
+                                        <div>
+                                            <div className="stat-label">Est. Wait</div>
+                                            <div className="stat-value">{wait} min</div>
+                                        </div>
+                                    </div>
+                                    <div className="stat-item">
+                                        <div className="stat-icon-box purple">
+                                            <FiHash />
+                                        </div>
+                                        <div>
+                                            <div className="stat-label">Total Tokens</div>
+                                            <div className="stat-value">{total}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* PROGRESS */}
+                                <div className="tc-progress">
+                                    <span className="progress-label">Progress</span>
+                                    <div className="progress-bar">
+                                        <div
+                                            className="progress-fill"
+                                            style={{ width: `${pct}%` }}
+                                        />
+                                    </div>
+                                    <span className="progress-count">
+                                        {done} / {total} · {pct}%
+                                    </span>
+                                </div>
+
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
 
         </div>
-
-      </div>
-
-    </div>
-  );
+    );
 };
 
 export default QueueStatus;
